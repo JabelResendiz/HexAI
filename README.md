@@ -1,1 +1,1 @@
-# Hex-IA
+# HexAI
