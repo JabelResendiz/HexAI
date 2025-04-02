@@ -8,6 +8,37 @@ class HexBoard:
         self.board=  np.zeros((size,size), dtype = int)
         self.player_positions = {1: set(), 2: set()}  # Registro de fichas por jugador
 
+
+        self.parent = {}
+        self.size_uf = {}
+        self.directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, 1), (1, -1)]
+
+        for r in range(size):
+            for c in range(size):
+                self.parent[(r,c)] = (r,c)
+                self.size_uf[(r,c)] = 1
+    
+    def find (self,cell):
+        """Busca el representante de un conjunto (con compresion de caminos)"""
+
+        if self.parent[cell] != cell:
+            self.parent[cell] = self.find(self.parent[cell])
+        
+        return self.parent[cell]
+    
+    def union(self,cell1,cell2):
+        """Une dos celdas en el mismo conjunto (union por tamanno)"""
+
+        root1= self.find(cell1)
+        root2= self.find(cell2)
+
+        if root1!=root2:
+            if self.size_uf[root1] < self.size_uf[root2]:
+                root1,root2 = root2, root1
+            
+            self.parent[root2] = root1
+            self.size_uf[root1]+= self.size_uf[root2]
+
     def clone(self) -> 'HexBoard':
         """Devuelve una copia del tablero actual"""
         new_board = HexBoard(self.size)
@@ -30,8 +61,13 @@ class HexBoard:
         self.board[row][col] = player_id
         self.player_positions[player_id].add((row,col))
 
+        
+        for dr, dc in self.directions:
+            nr, nc = row + dr, col + dc
+            if 0 <= nr < self.size and 0 <= nc < self.size and self.board[nr][nc] == player_id:
+                self.union((row, col), (nr, nc))
+
         return True
-            
 
 
     def get_possible_moves(self) -> list:
@@ -45,4 +81,32 @@ class HexBoard:
     
     def check_connection(self, player_id: int) -> bool:
         """Verifica si el jugador ha conectado sus dos lados"""
-        pass
+        
+        if player_id==1:
+            start_edge = [(r,0) for r in range(self.size) if self.board[r][0]==1]
+            target_column = self.size-1
+            is_goal = lambda r, c: c== target_column
+
+        else :
+            start_edge = [(0,c) for c in range(self.size) if self.board[0][c]==2]
+            target_row = self.size -1
+            is_goal = lambda r, c: r == target_row
+        
+        stack = start_edge[:]
+        visited= set(start_edge)
+
+        while stack:
+            r,c = stack.pop()
+
+            if is_goal(r,c):
+                return True
+            
+            for dr,dc in self.directions:
+                nr,nc = r+dr, c+dc
+                if 0<= nr < self.size and 0<=nc < self.size and (nr,nc) not in visited:
+                    if self.board[nr][nc] == player_id and self.find((r,c))== self.find((nr,nc)):
+                        stack.append((nr,nc))
+                        visited.add((nr,nc))
+
+        return False
+        
