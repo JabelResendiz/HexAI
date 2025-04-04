@@ -82,31 +82,45 @@ class HexBoard:
     def check_connection(self, player_id: int) -> bool:
         """Verifica si el jugador ha conectado sus dos lados"""
         
-        if player_id==1:
+        if player_id == 1:
             start_edge = [(r,0) for r in range(self.size) if self.board[r][0]==1]
-            target_column = self.size-1
-            is_goal = lambda r, c: c== target_column
-
-        else :
-            start_edge = [(0,c) for c in range(self.size) if self.board[0][c]==2]
-            target_row = self.size -1
-            is_goal = lambda r, c: r == target_row
+            target_edge = [(r,self.size-1) for r in range(self.size) if self.board[r][self.size-1]==1]
         
-        stack = start_edge[:]
-        visited= set(start_edge)
+        else :
+            start_edge = [(0,r) for r in range(self.size) if self.board[0][r]==2]
+            target_edge = [(self.size-1,r) for r in range(self.size) if self.board[self.size-1][r]==2]
 
-        while stack:
-            r,c = stack.pop()
 
-            if is_goal(r,c):
-                return True
-            
-            for dr,dc in self.directions:
-                nr,nc = r+dr, c+dc
-                if 0<= nr < self.size and 0<=nc < self.size and (nr,nc) not in visited:
-                    if self.board[nr][nc] == player_id and self.find((r,c))== self.find((nr,nc)):
-                        stack.append((nr,nc))
-                        visited.add((nr,nc))
+        for start in start_edge:
+            root_start = self.find(start)
+            for target in target_edge:
+                if root_start == self.find(target):
+                    return True
+        
 
         return False
         
+
+    def print_board(self):
+        space = ""
+        print(space , end="     ")
+        for i in range(self.size):
+            print(f"\033[31m{i}  \033[0m", end=" ")
+        print("\n")
+        for i in range(self.size):
+            print(space , end=" ")
+            print(f"\033[34m{i}  \033[0m",end=" ")
+            for j in range(self.size):
+                if self.board[i][j] == 0:
+                    print("⬜ ",end=" ")
+                if self.board[i][j] == 1:
+                    print("🟥 ",end=" ")
+                if self.board[i][j] == 2:
+                    print("🟦 ",end=" ")
+                if j == self.size -1:
+                    print(f"\033[34m {i} \033[0m",end=" ")
+            space += "  "
+            print("\n")
+        print(space,end="    ")
+        for i in range(self.size):
+            print(f"\033[31m{i}  \033[0m", end=" ")
