@@ -1,7 +1,7 @@
 import os
 import time
 from board import HexBoard
-from player import IAPlayer
+# from player import IAPlayer
 
 def clear_console():
     """Limpia la pantalla de la consola."""

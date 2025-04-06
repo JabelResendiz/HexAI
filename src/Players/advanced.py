@@ -76,7 +76,8 @@ class IAPlayerAdvanced(Player):
 
                 if alpha >= beta:
                     break
-
+            
+            print(value)
             return value
 
         else :
@@ -91,5 +92,6 @@ class IAPlayerAdvanced(Player):
 
                 if alpha>=beta:
                     break
-
+            
+            print(value)
             return value 
