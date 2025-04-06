@@ -1,4 +1,3 @@
-
 from board import HexBoard
 from player import Player
 import random
@@ -37,7 +36,6 @@ class IAPlayerAdvanced(Player):
     def heuristic_with_bonus(self, board: HexBoard) -> int:
         max_size_p1, max_size_p2 = 0, 0
 
-    # Calcula el grupo más grande para cada jugador
         for player in [1, 2]:
             max_size = 0
             for cell in board.player_positions[player]:
@@ -49,9 +47,49 @@ class IAPlayerAdvanced(Player):
             else:
                 max_size_p2 = max_size
 
-    # Bonificación por conexión a bordes
         bonus_p1 = 100 if board.check_connection(1) else 0
         bonus_p2 = 100 if board.check_connection(2) else 0
 
         return (max_size_p1 + bonus_p1) - (max_size_p2 + bonus_p2)
         
+    def minimax(self,board:HexBoard, 
+                depth :int, 
+                maximizing_player: bool ,
+                alpha : float= -float('inf'), 
+                beta: float = float('inf'))-> float :
+
+        """Implementacion del algoritmo del minimax usando poda alpha-beta"""
+        
+        if depth ==0 or board.check_connection(1) or board.check_connection(2):
+            return self.heuristic_with_bonus(board)
+        
+        if maximizing_player:
+            value = -float('inf')
+
+            for move in board.get_possible_moves():
+                new_board = board.clone()
+                new_board.place_piece(move[0],move[1],1)
+
+                value = max(value, self.minimax(new_board,depth-1,False,alpha,beta))
+
+                alpha = max(alpha,value)
+
+                if alpha >= beta:
+                    break
+
+            return value
+
+        else :
+            value = float('inf')
+            for move in board.get_possible_moves():
+                new_board = board.clone()
+                new_board.place_piece(move[0],move[1],2)
+
+                value = min(value, self.minimax(new_board,depth-1,True,alpha,beta))
+
+                beta= min(beta,value)
+
+                if alpha>=beta:
+                    break
+
+            return value 
