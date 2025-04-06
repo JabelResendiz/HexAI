@@ -45,12 +45,14 @@ class HexBoard:
         #new_board.board = [row[:] for row in self.board] 
         new_board.board= self.board.copy()
         new_board.player_positions = {1: self.player_positions[1].copy(), 2: self.player_positions[2].copy()}  
+        new_board.parent = self.parent.copy()
+        new_board.size_uf = self.size_uf.copy()
         return new_board
     
 
     def place_piece(self, row: int, col: int, player_id: int) -> bool:
         """Coloca una ficha si la casilla está vacía."""
-        if row > self.size or row < 0 or col > self.size or col <0:
+        if row >= self.size or row < 0 or col >= self.size or col <0:
 
             return False
     
@@ -78,6 +80,10 @@ class HexBoard:
                         if self.board[row][col]==0
                 ]
 
+        # for row in range(self.size):
+        #     for col in range(self.size):
+        #         if self.board[row][col] == 0:
+        #             yield (row,col)
     
     def check_connection(self, player_id: int) -> bool:
         """Verifica si el jugador ha conectado sus dos lados"""
@@ -91,14 +97,19 @@ class HexBoard:
             target_edge = [(self.size-1,r) for r in range(self.size) if self.board[self.size-1][r]==2]
 
 
-        for start in start_edge:
-            root_start = self.find(start)
-            for target in target_edge:
-                if root_start == self.find(target):
-                    return True
+        start_root = {self.find(start) for start in start_edge}
+        target_root = {self.find(target) for target in target_edge}
+
+        return not start_root.isdisjoint(target_root)
+    
+        # for start in start_edge:
+        #     root_start = self.find(start)
+        #     for target in target_edge:
+        #         if root_start == self.find(target):
+        #             return True
         
 
-        return False
+        # return False
         
 
     def print_board(self):
