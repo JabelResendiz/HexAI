@@ -8,9 +8,7 @@ class IAPlayerAdvanced(Player):
     
     def play(self,board: HexBoard)-> tuple:
 
-        possible_moves = board.get_possible_moves()
-
-        return random.choice(possible_moves) if possible_moves else None
+        return self.minimax(board,6,self.player_id == 1)
             
             
     def heuristic(self,board: HexBoard)-> int:

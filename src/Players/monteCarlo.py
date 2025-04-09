@@ -68,6 +68,7 @@ class MCTSPlayer(Player):
         player = current_player
         while not board.check_connection(1) and not board.check_connection(2):
             moves = board.get_possible_moves()
+            # usar rollouts informados o heuristica en vez de random
             move = random.choice(moves)
             board.place_piece(move[0], move[1], player)
             player = 2 if player == 1 else 1
@@ -84,8 +85,8 @@ class MCTSPlayer(Player):
 
 
 board = HexBoard(11)
-player1 = MCTSPlayer(1, simulations=1000)
-player2 = MCTSPlayer(2, simulations=1000)
+player1 = MCTSPlayer(1, simulations=100)
+player2 = MCTSPlayer(2, simulations=100)
 
 while True:
     board.print_board()

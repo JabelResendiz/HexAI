@@ -1,4 +1,5 @@
 import numpy as np
+from sortedcontainers import SortedSet
 
 class HexBoard:
     def __init__(self, size: int):
@@ -10,14 +11,16 @@ class HexBoard:
 
 
         self.parent = {}
+
+        
         self.size_uf = {}
+
+        
+
         self.directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, 1), (1, -1)]
 
-        for r in range(size):
-            for c in range(size):
-                self.parent[(r,c)] = (r,c)
-                self.size_uf[(r,c)] = 1
-    
+        
+        
     def find (self,cell):
         """Busca el representante de un conjunto (con compresion de caminos)"""
 
@@ -102,14 +105,7 @@ class HexBoard:
 
         return not start_root.isdisjoint(target_root)
     
-        # for start in start_edge:
-        #     root_start = self.find(start)
-        #     for target in target_edge:
-        #         if root_start == self.find(target):
-        #             return True
         
-
-        # return False
         
 
     def print_board(self):
@@ -135,3 +131,6 @@ class HexBoard:
         print(space,end="    ")
         for i in range(self.size):
             print(f"\033[31m{i}  \033[0m", end=" ")
+
+
+
