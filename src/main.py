@@ -36,10 +36,11 @@ print(board.check_connection(1))  # Esperamos True si conectó
 print("¿Jugador 1 conectó mediante puente?")
 print(board.check_bridges_pattern(1))  # También puedes probar esto
 
-g= Graph(board.parent,board,board.bridge_parent)
+print(board.bfs(1))
 
-print(g.process_path(1))
+# player_1 = IAPlayerBridges(1)
 
+# print(player_1.play(board))
 
 #print(board.parent)
 
@@ -53,79 +54,79 @@ print(g.process_path(1))
 
 
 
-# def clear_console():
-#     """Limpia la pantalla de la consola."""
-#     os.system('cls' if os.name == 'nt' else 'clear')
+def clear_console():
+    """Limpia la pantalla de la consola."""
+    os.system('cls' if os.name == 'nt' else 'clear')
 
-# def print_colored(text, color):
-#     """Imprime texto con color en la consola."""
-#     colors = {"red": "\033[91m", "blue": "\033[94m", "reset": "\033[0m"}
-#     return f"{colors[color]}{text}{colors['reset']}"
-
-
-# def get_human_move(board):
-#     """Solicita y valida un movimiento del jugador humano."""
-#     while True:
-#         move_input = input("\nIngrese su movimiento (fila columna): ")
-#         try:
-#             row, col = map(int, move_input.split())
-#             if (row, col) in board.get_possible_moves():
-#                 return row, col
-#             else:
-#                 print(print_colored("❌ Movimiento no válido o casilla ocupada. Inténtelo de nuevo.", "red"))
-#         except ValueError:
-#             print(print_colored("❌ Entrada inválida. Formato correcto: fila columna (ejemplo: 2 3)", "red"))
+def print_colored(text, color):
+    """Imprime texto con color en la consola."""
+    colors = {"red": "\033[91m", "blue": "\033[94m", "reset": "\033[0m"}
+    return f"{colors[color]}{text}{colors['reset']}"
 
 
+def get_human_move(board):
+    """Solicita y valida un movimiento del jugador humano."""
+    while True:
+        move_input = input("\nIngrese su movimiento (fila columna): ")
+        try:
+            row, col = map(int, move_input.split())
+            if (row, col) in board.get_possible_moves():
+                return row, col
+            else:
+                print(print_colored("❌ Movimiento no válido o casilla ocupada. Inténtelo de nuevo.", "red"))
+        except ValueError:
+            print(print_colored("❌ Entrada inválida. Formato correcto: fila columna (ejemplo: 2 3)", "red"))
 
-# player_objects = { 1: IAPlayerBridges(1), 2:None}
 
-# current_player =2
 
-# while True:
-#     clear_console()
-#     board.print_board()
+player_objects = { 1: IAPlayerBridges(1), 2:None}
 
-#     if board.check_connection(1):
-#         print(print_colored("\n🏆 ¡El jugador 1 (🔴) ha ganado!", "red"))
-#         break
-#     if board.check_connection(2):
-#         print(print_colored("\n🏆 ¡El jugador 2 (🔵) ha ganado!", "blue"))
-#         break
-#     if not board.get_possible_moves():
-#         print(print_colored("\n🤝 Empate. No hay más movimientos disponibles.", "blue"))
-#         break
+current_player =2
 
-#     print(f"\nTurno del jugador {current_player} ({'🔴' if current_player == 1 else '🔵'})")
+while True:
+    clear_console()
+    board.print_board()
 
-#     if player_objects[current_player] is None:
-#         # Turno del jugador humano
-#         row, col = get_human_move(board)
-#         board.place_piece(row, col, current_player)
+    if board.check_connection(1):
+        print(print_colored("\n🏆 ¡El jugador 1 (🔴) ha ganado!", "red"))
+        break
+    if board.check_connection(2):
+        print(print_colored("\n🏆 ¡El jugador 2 (🔵) ha ganado!", "blue"))
+        break
+    if not board.get_possible_moves():
+        print(print_colored("\n🤝 Empate. No hay más movimientos disponibles.", "blue"))
+        break
 
-#         # Mostrar el tablero después de la jugada humana
-#         clear_console()
-#         board.print_board()
-#         print(print_colored(f"\n✅ Jugada del jugador humano en ({row}, {col})", "blue"))
-#         time.sleep(1.5)  # Pausa para que el jugador vea la jugada antes de que la IA responda
+    print(f"\nTurno del jugador {current_player} ({'🔴' if current_player == 1 else '🔵'})")
 
-#     else:
-#         # Turno de la IA
-#         print("🤖 Pensando...")
-#         time.sleep(0.5)
-#         row, col = player_objects[current_player].play(board)
-#         board.place_piece(row, col, current_player)
+    if player_objects[current_player] is None:
+        # Turno del jugador humano
+        row, col = get_human_move(board)
+        board.place_piece(row, col, current_player)
 
-#         # Mostrar el tablero después de la jugada de la IA
-#         #
+        # Mostrar el tablero después de la jugada humana
+        clear_console()
+        board.print_board()
+        print(print_colored(f"\n✅ Jugada del jugador humano en ({row}, {col})", "blue"))
+        time.sleep(1.5)  # Pausa para que el jugador vea la jugada antes de que la IA responda
+
+    else:
+        # Turno de la IA
+        print("🤖 Pensando...")
+        time.sleep(0.5)
+        row, col = player_objects[current_player].play(board)
+        board.place_piece(row, col, current_player)
+
+        # Mostrar el tablero después de la jugada de la IA
+        #
         
-#         print(print_colored(f"\n🤖 La IA jugó en ({row}, {col})", "red"))
-#         time.sleep(10.5)  # Pausa para que el humano vea la jugada
-#         clear_console()
-#         board.print_board()
+        print(print_colored(f"\n🤖 La IA jugó en ({row}, {col})", "red"))
+        time.sleep(4.5)  # Pausa para que el humano vea la jugada
+        clear_console()
+        board.print_board()
 
-#     # Cambiar de jugador
-#     current_player = 3 - current_player
+    # Cambiar de jugador
+    current_player = 3 - current_player
 
     
 

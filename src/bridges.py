@@ -56,71 +56,120 @@ class IAPlayerBridges(Player):
         #print(78787878787)
         return None
     
-    def make_move(self,board:HexBoard,path) -> tuple:
-        
+    def make_move(self,board:HexBoard,path:list) -> tuple:
         
         for i in range(len(path)):
+
             nr,nc = path[i]
-            
-            if self.player_id==2 and nr == 0:
-                continue
-            elif self.player_id ==1 and nc ==0:
-                continue
-            
-            if self.player_id == 1 and nc ==1:
-                if board.is_on_board((nr,0)) and board.board[nr][0] ==2:
-                    continue
-                if board.is_on_board((nr+1,0)) and board.board[nr+1][0] ==2:
-                    continue
 
+            #print((nr,nc))
+            if (self.player_id == 1 and nc ==0) or (self.player_id ==2 and nr ==0):
+                continue
+            if (self.player_id == 1 and nc == board.size-1)  or (self.player_id == 2 and nr == board.size-1):
+                continue
+
+            if self.player_id == 1 and nc == 1:
                 return (nr,0)
-            
-            elif self.player_id == 2 and nr == 1:
-                if board.is_on_board((0,nc)) and board.board[0][nc] ==2:
-                    continue
-                if board.is_on_board((0,nc+1)) and board.board[0][nc+1] ==2:
-                    continue
 
+            if self.player_id == 2 and nr ==1:
                 return (0,nc)
             
-
-            if self.player_id == 1 and nc == board.size-1:
-                continue
-            elif self.player_id == 2 and nr == board.size -1:
-                continue
-            
             if self.player_id == 1 and nc == board.size-2:
-                if board.is_on_board((nr,board.size-1)) and board.board[nr][board.size-1] ==2:
-                    continue
-                if board.is_on_board((nr-1,board.size-1)) and board.board[nr-1][board.size-1] ==2:
-                    continue
+                return (nr,nc+1)
 
-                return (nr,board.size-1)
+            if self.player_id == 2 and nr ==board.size-2:
+                return (nr+1,nc)
             
-            elif self.player_id == 2 and nr == board.size-2:
-                if board.is_on_board((board.size-1,nc)) and board.board[board.size-1][nc] ==2:
-                    continue
-                if board.is_on_board((board.size-1,nc-1)) and board.board[ board.size-1][nc-1] ==2:
-                    continue
-
-                return (board.size-1,nc)
+            # 2dos vertices
 
             nr1,nc1 = path[i-1]
 
-            f,v = nr1-nr,nc1-nc
+            hommies = board.search_all_hommies((nr,nc))
+
+            #print(f"Los hommies de ({nr},{nc}) son: {hommies}")
+
+            for u in hommies:
+                dx = u[0] - nr1
+                dy = u[1] - nc1
+                
+                #print(dx,dy)
+                
+                for bridge_vec, neighbor1, neighbor2 in self.bridge_patterns:
+                    if (dx, dy) == bridge_vec:
+                        n1 = (nr1 + neighbor1[0], nc1 + neighbor1[1])
+                        n2 = (nr1 + neighbor2[0], nc1 + neighbor2[1])
+
+                        #print(n1,n2)
+
+                        if (board.is_on_board(n1) and board.board[n1[0]][n1[1]] == 0):
+                            return n1  
+                        if (board.is_on_board(n2) and board.board[n2[0]][n2[1]] == 0):
+                            return n2
+
+
+        
+        # for i in range(len(path)):
+        #     nr,nc = path[i]
+            
+        #     if self.player_id==2 and nr == 0:
+        #         continue
+        #     elif self.player_id ==1 and nc ==0:
+        #         continue
+            
+        #     if self.player_id == 1 and nc ==1:
+        #         if board.is_on_board((nr,0)) and board.board[nr][0] ==2:
+        #             continue
+        #         if board.is_on_board((nr+1,0)) and board.board[nr+1][0] ==2:
+        #             continue
+
+        #         return (nr,0)
+            
+        #     elif self.player_id == 2 and nr == 1:
+        #         if board.is_on_board((0,nc)) and board.board[0][nc] ==2:
+        #             continue
+        #         if board.is_on_board((0,nc+1)) and board.board[0][nc+1] ==2:
+        #             continue
+
+        #         return (0,nc)
+            
+
+        #     if self.player_id == 1 and nc == board.size-1:
+        #         continue
+        #     elif self.player_id == 2 and nr == board.size -1:
+        #         continue
+            
+        #     if self.player_id == 1 and nc == board.size-2:
+        #         if board.is_on_board((nr,board.size-1)) and board.board[nr][board.size-1] ==2:
+        #             continue
+        #         if board.is_on_board((nr-1,board.size-1)) and board.board[nr-1][board.size-1] ==2:
+        #             continue
+
+        #         return (nr,board.size-1)
+            
+        #     elif self.player_id == 2 and nr == board.size-2:
+        #         if board.is_on_board((board.size-1,nc)) and board.board[board.size-1][nc] ==2:
+        #             continue
+        #         if board.is_on_board((board.size-1,nc-1)) and board.board[ board.size-1][nc-1] ==2:
+        #             continue
+
+        #         return (board.size-1,nc)
+
+        #     nr1,nc1 = path[i-1]
+
+        #     f,v = nr1-nr,nc1-nc
 
             
 
-            for pattern in self.bridge_patterns:
-                bridge_vec, neighbor1, neighbor2 = pattern
-                if (f, v) == bridge_vec:
-                    break
+        #     for pattern in self.bridge_patterns:
+        #         bridge_vec, neighbor1, neighbor2 = pattern
+        #         if (f, v) == bridge_vec:
+        #             break
             
-            if board.board[nr+neighbor1[0]][nc+neighbor1[1]] == 2 or board.board[nr+neighbor2[0]][nc+neighbor2[1]] ==2 :
-                continue
+        #     if board.board[nr+neighbor1[0]][nc+neighbor1[1]] == 2 or board.board[nr+neighbor2[0]][nc+neighbor2[1]] ==2 :
+        #         continue
             
-            else:
-                return (nr+neighbor1[0], nc+ neighbor1[1])
+        #     else:
+        #         return (nr+neighbor1[0], nc+ neighbor1[1])
             
 
                         
@@ -153,12 +202,12 @@ class IAPlayerBridges(Player):
         if board.check_bridges_pattern(self.player_id):
             
            # print(898989898)
-            graph = Graph(board.parent,board.bridge_parent)
 
-            bfs = graph.bfs(self.player_id)
-
+            bfs = board.bfs(self.player_id)
+            #print(bfs)
             
             return self.make_move(board,bfs)
+        
             # print("El path es :" ,path)
             # return self.make_move(board,path)
         

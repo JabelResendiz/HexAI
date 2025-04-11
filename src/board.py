@@ -197,71 +197,113 @@ class HexBoard:
         return self.find(v1,True) == self.find(v2,True)
     
     
-    # def bfs(self,player_id:int) -> list:
+    def bfs(self,player_id:int) -> list:
 
         
-        
-    #     if player_id ==1 :
-    #         v = self.find("LEFT")
-    #         w = self.find("RIGHT")
-    #         start_edge = {node for node in self.parent if self.parent[node] == v and node != "LEFT"}
-    #         target_edge = {node for node in self.parent if self.parent[node] == w and node != "RIGHT"}
-    #         start_edge |= {(r,1) for r in range(self.size) if self.board[r][1] == 1}
-    #         target_edge |= {(r,self.size-2) for r in range(self.size) if self.board[r][self.size-2]==1}
+        if player_id ==1 :
+            v = self.find("LEFT")
+            w = self.find("RIGHT")
+            start_edge = {node for node in self.parent if self.parent[node] == v and node != "LEFT"}
+            target_edge = {node for node in self.parent if self.parent[node] == w and node != "RIGHT"}
+            start_edge2 = {(r,1) for r in range(self.size) if self.board[r][1] == 1}
+            target_edge2 = {(r,self.size-2) for r in range(self.size) if self.board[r][self.size-2]==1}
             
-    #     else:
-    #         v = self.find("TOP")
-    #         w = self.find("BOTTOM")
-    #         start_edge ={node for node in self.parent if self.parent[node] == v and node != "TOP"}
-    #         target_edge = {node for node in self.parent if self.parent[node] == w and node != "BOTTOM"}
-    #         start_edge |={(1,c) for c in range(self.size) if self.board[1][c] ==2}
-    #         target_edge |= {(self.size-2,c) for c in range (self.size) if self.board[self.size-2][c]==2}
+        else:
+            v = self.find("TOP")
+            w = self.find("BOTTOM")
+            start_edge ={node for node in self.parent if self.parent[node] == v and node != "TOP"}
+            target_edge = {node for node in self.parent if self.parent[node] == w and node != "BOTTOM"}
+            start_edge2 ={(1,c) for c in range(self.size) if self.board[1][c] ==2}
+            target_edge2 = {(self.size-2,c) for c in range (self.size) if self.board[self.size-2][c]==2}
+
+        def shortest_path(*paths):
+            non_empty_paths = [path for path in paths if path]
+            return min(non_empty_paths, key= len)
         
+        d1 = self.run_bfs(player_id,start_edge,target_edge)
+        d2= self.run_bfs(player_id,start_edge,target_edge2)
+        d3 = self.run_bfs(player_id,start_edge2,target_edge)
+        d4 = self.run_bfs(player_id,start_edge2,target_edge2)
         
-    #     # print(start_edge)
-    #     # print(target_edge)
 
-    #     visited= set()
-    #     queue = deque()
-    #     parent_map = {}
+        return shortest_path(d1,d2,d3,d4)
 
+    # def search_all_hommies(self,cell):
+        
+    #     root = self.find(cell)
 
-    #     for start in start_edge:
-    #         queue.append(start)
-    #         visited.add(start)
-    #         parent_map[start] = None
+    #     result = []
 
-    #     while queue:
+    #     for c in range(len(self.parent)):
+    #         if self.find(c) == root:
+    #             result.append(c)
+        
+    #     return result
 
-    #         current = queue.popleft()
-            
-    #         if current in target_edge:
+    def search_all_hommies(self, cell):
+        root = self.find(cell)
+        return [c for c in self.parent if self.find(c) == root and isinstance(c, tuple)]
+
+    
+
+    def run_bfs(self,player_id,start_edge,target_edge):
+
+        visited= set()
+        visited_parent = set ()
+        queue = deque()
+        parent_map = {}
+
+        # start_edge podrian ser desde el punto de vista los representantes de grupos en si 
+        # asi que primero debemos 
+        for start in start_edge:
+            if self.find(start) not in visited_parent:
+                result = self.search_all_hommies(start)
+                #print(result)
+                for e in result:
+                    queue.append(e)
+                    visited.add(e)
+                    parent_map[e] = None
                 
-    #             path = []
+                visited_parent.add(self.find(start))
 
-    #             while current is not None:
-    #                 path.append(current)
-    #                 current = parent_map[current]
 
-    #             path.reverse()
+        while queue:
 
-    #             return path
+            current = queue.popleft()
             
-    #         all_directions = self.directions + self.vector_move_bridges
+            if current in target_edge:
+                
+                path = []
+
+                while current is not None:
+                    path.append(current)
+                    current = parent_map[current]
+
+                path.reverse()
+
+                return path
             
-    #         for dr,dc in all_directions:
-    #             nc,nr = current[0]+dr, current[1]+dc
-    #             if self.is_on_board((nc,nr)):
-    #                 if self.board[nc][nr] == player_id and (nc,nr) not in visited:
-    #                     visited.add((nc,nr))
-    #                     queue.append((nc,nr))
-    #                     parent_map[(nc,nr)] = current
+            all_directions = self.directions + self.vector_move_bridges
+            
+            for dr,dc in all_directions:
+                nc,nr = current[0]+dr, current[1]+dc
+                if self.is_on_board((nc,nr)):
+                    if self.board[nc][nr] == player_id and (nc,nr) not in visited:
+                        if self.find((nc,nr)) not in visited_parent:
+                            result = self.search_all_hommies((nc,nr))
+                            for e in result:
+                                queue.append(e)
+                                visited.add(e)
+                                parent_map[e] = current
+                            
+                            visited_parent.add(self.find((nc,nr)))
+                        # visited.add((nc,nr))
+                        # queue.append((nc,nr))
+                        # parent_map[(nc,nr)] = current
                         
             
-    #     return []
-
-
-
+        return []
+        
 
     def print_board(self):
         space = ""
