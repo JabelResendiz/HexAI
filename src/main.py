@@ -14,29 +14,29 @@ board = HexBoard(size=11)
 # board.place_piece(0, 3, 1)
 # board.place_piece(0, 4, 1)
 
-board.place_piece(1,3,1)
-board.place_piece(2,2,1)
-board.place_piece(3,0,1)
+# board.place_piece(1,3,1)
+# board.place_piece(2,2,1)
+# board.place_piece(3,0,1)
 
-board.place_piece(0,5,1)
-board.place_piece(3,3,1)
-board.place_piece(1,5,1)
-board.place_piece(4,4,1)
-board.place_piece(3,6,1)
-board.place_piece(1,6,1)
-board.place_piece(1,7,1)
+# board.place_piece(0,5,1)
+# board.place_piece(3,3,1)
+# board.place_piece(1,5,1)
+# board.place_piece(4,4,1)
+# board.place_piece(3,6,1)
+# board.place_piece(1,6,1)
+# board.place_piece(1,7,1)
 
-board.place_piece(2,8,1)
-board.place_piece(1,10,1)
-board.print_board()
+# board.place_piece(2,8,1)
+# board.place_piece(1,10,1)
+# board.print_board()
 
-print("¿Jugador 1 conectó izquierda a derecha?")
-print(board.check_connection(1))  # Esperamos True si conectó
+# print("¿Jugador 1 conectó izquierda a derecha?")
+# print(board.check_connection(1))  # Esperamos True si conectó
 
-print("¿Jugador 1 conectó mediante puente?")
-print(board.check_bridges_pattern(1))  # También puedes probar esto
+# print("¿Jugador 1 conectó mediante puente?")
+# print(board.check_bridges_pattern(1))  # También puedes probar esto
 
-print(board.bfs(1))
+# print(board.bfs(1))
 
 # player_1 = IAPlayerBridges(1)
 
@@ -81,7 +81,7 @@ def get_human_move(board):
 
 player_objects = { 1: IAPlayerBridges(1), 2:None}
 
-current_player =2
+current_player = 1
 
 while True:
     clear_console()
@@ -113,7 +113,7 @@ while True:
     else:
         # Turno de la IA
         print("🤖 Pensando...")
-        time.sleep(0.5)
+        time.sleep(.5)
         row, col = player_objects[current_player].play(board)
         board.place_piece(row, col, current_player)
 
@@ -121,7 +121,7 @@ while True:
         #
         
         print(print_colored(f"\n🤖 La IA jugó en ({row}, {col})", "red"))
-        time.sleep(4.5)  # Pausa para que el humano vea la jugada
+        time.sleep(.5)  # Pausa para que el humano vea la jugada
         clear_console()
         board.print_board()
 

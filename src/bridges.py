@@ -1,7 +1,8 @@
 
-from board import HexBoard,Graph
+from board import HexBoard
 from player import Player
 import math
+import random
 
 class IAPlayerBridges(Player):
 
@@ -25,6 +26,8 @@ class IAPlayerBridges(Player):
             ((1, 1), (1, 0), (0, 1)),
             ((2, -1), (1, 0), (1, -1)),
         ]
+
+        self.is_minimo = True
     
     
 
@@ -35,7 +38,7 @@ class IAPlayerBridges(Player):
             return (mid,mid)
 
         move = self.heurisitic_bridges(board,board.last_move)
-        #print(move)
+
         return move
         
 
@@ -45,15 +48,12 @@ class IAPlayerBridges(Player):
         s = (f[0] + v_second[0], f[1] + v_second[1])
         o = (f[0] + v_out[0], f[1] + v_out[1])
 
-        # print(f)
-        # print(s)
-        # print(o)
 
         if (0 <= o[0] < size and 0 <= o[1] < size
-            and f in player_moves and s in player_moves):
-            #print(89898989)
+            and f in player_moves and (s in player_moves or (self.player_id == 1 and (s[1]==0 or s[1]== size))
+                                                         or  (self.player_id == 2 and (s[0]==0 or s[0]==size)))):
             return o
-        #print(78787878787)
+        
         return None
     
     def make_move(self,board:HexBoard,path:list) -> tuple:
@@ -105,79 +105,59 @@ class IAPlayerBridges(Player):
                             return n1  
                         if (board.is_on_board(n2) and board.board[n2[0]][n2[1]] == 0):
                             return n2
+            
 
+    def search_best_path(self,board:HexBoard) -> tuple:
+
+        value_min = board.size +1
+        value_max = - value_min
+        my_bridges = board.player_positions[self.player_id]
+
+        # si no esta vacio busco una jugada aleatoria para jugar 
+        if not my_bridges:
+            return random.choice(board.get_possible_moves())
+        
+
+        for (r,c) in my_bridges:
+            for bridge_vec, neighbor1, neighbor2 in self.bridge_patterns:
+                dx = (r+ bridge_vec[0], c + bridge_vec[1])
+                n1 = (r + neighbor1[0], c+neighbor1[1])
+                n2  = (r+neighbor2[0], c + neighbor2[1])
+
+                if  (board.is_on_board(dx) and board.is_on_board(n1) and board.is_on_board(n2)
+                    and board.board[dx[0]][dx[1]] == 0 and
+                        board.board[n1[0]][n1[1]] == 0 and
+                        board.board[n2[0]][n2[1]] == 0):
+                     
+                    if self.is_minimo:
+                         
+                        if self.player_id == 1 and dx[1] < value_min:
+                            value_min = dx[1]
+                            move = dx
+                        
+                        elif self.player_id == 2 and dx[0] <value_min:
+                            value_min = dx[0]
+                            move = dx
+                    
+                    else: # es de maximizar
+
+                        if self.player_id  == 1 and dx[1] > value_max:
+                            value_max = dx[1]
+                            move = dx
+
+                        elif self.player_id ==2 and dx[0] > value_max:
+                            value_max = dx[0]
+                            move = dx  
+
+        if self.player_id == 1 and move[1] <=1:
+            self.is_minimo = False
+        elif self.player_id == 2 and move[0] <=1:
+            self.is_minimo = False
+
+        return move
+        
 
         
-        # for i in range(len(path)):
-        #     nr,nc = path[i]
-            
-        #     if self.player_id==2 and nr == 0:
-        #         continue
-        #     elif self.player_id ==1 and nc ==0:
-        #         continue
-            
-        #     if self.player_id == 1 and nc ==1:
-        #         if board.is_on_board((nr,0)) and board.board[nr][0] ==2:
-        #             continue
-        #         if board.is_on_board((nr+1,0)) and board.board[nr+1][0] ==2:
-        #             continue
-
-        #         return (nr,0)
-            
-        #     elif self.player_id == 2 and nr == 1:
-        #         if board.is_on_board((0,nc)) and board.board[0][nc] ==2:
-        #             continue
-        #         if board.is_on_board((0,nc+1)) and board.board[0][nc+1] ==2:
-        #             continue
-
-        #         return (0,nc)
-            
-
-        #     if self.player_id == 1 and nc == board.size-1:
-        #         continue
-        #     elif self.player_id == 2 and nr == board.size -1:
-        #         continue
-            
-        #     if self.player_id == 1 and nc == board.size-2:
-        #         if board.is_on_board((nr,board.size-1)) and board.board[nr][board.size-1] ==2:
-        #             continue
-        #         if board.is_on_board((nr-1,board.size-1)) and board.board[nr-1][board.size-1] ==2:
-        #             continue
-
-        #         return (nr,board.size-1)
-            
-        #     elif self.player_id == 2 and nr == board.size-2:
-        #         if board.is_on_board((board.size-1,nc)) and board.board[board.size-1][nc] ==2:
-        #             continue
-        #         if board.is_on_board((board.size-1,nc-1)) and board.board[ board.size-1][nc-1] ==2:
-        #             continue
-
-        #         return (board.size-1,nc)
-
-        #     nr1,nc1 = path[i-1]
-
-        #     f,v = nr1-nr,nc1-nc
-
-            
-
-        #     for pattern in self.bridge_patterns:
-        #         bridge_vec, neighbor1, neighbor2 = pattern
-        #         if (f, v) == bridge_vec:
-        #             break
-            
-        #     if board.board[nr+neighbor1[0]][nc+neighbor1[1]] == 2 or board.board[nr+neighbor2[0]][nc+neighbor2[1]] ==2 :
-        #         continue
-            
-        #     else:
-        #         return (nr+neighbor1[0], nc+ neighbor1[1])
-            
-
-                        
-
-            
-
-            
-
 
 
     def heurisitic_bridges(self, board: HexBoard, last_move_adv: tuple) -> tuple:
@@ -208,10 +188,11 @@ class IAPlayerBridges(Player):
             
             return self.make_move(board,bfs)
         
+
+        return self.search_best_path(board)
             # print("El path es :" ,path)
             # return self.make_move(board,path)
         
-        return None
         # en caso de que no tengamos el camino completo entonces debemos jugar a buscar el mejor camino
 
         
