@@ -1,5 +1,4 @@
 from board import HexBoard
-from player import Player
 import random
 
 
@@ -164,7 +163,7 @@ class IAPlayerBridges(Player):
             start_nodes = current_positions | {(cx, cy)} 
             
             # Calcular costo mínimo desde borde de entrada hasta borde de salida
-            cost = board.min_cost_between_sets(start_nodes,
+            cost = board.min_cost_between_sets_a_star(start_nodes,
                                                end_nodes,
                                                self.player_id,
                                                board.directions + board.vector_move_bridges,
